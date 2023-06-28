@@ -3,9 +3,8 @@
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Profile') }}
 
-            <x-nav-link :href="route('community.index')" :active="request()->routeIs('community.index')">
-                {{ __("Your's Communities") }}
-            </x-nav-link>
+          
+            
             
         </h2>
 

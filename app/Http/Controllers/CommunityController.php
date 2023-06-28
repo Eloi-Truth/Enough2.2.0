@@ -44,7 +44,14 @@ class CommunityController extends Controller
     public function show($id)
     {
         $community = Community::findOrFail($id);
-        return view('community.show', compact('community'));
+
+    // Verificar se o usuário está inscrito na comunidade
+    if (!$community->users()->where('community_user.user_id', auth()->id())->exists()) {
+        return redirect()->back()->with('error', 'Você não está inscrito nesta comunidade.');
+    }
+    
+
+    return view('community.show', compact('community'));
     }
 
     /**
@@ -77,10 +84,24 @@ class CommunityController extends Controller
     }
 
     public function subscribe(Request $request, Community $community)
+    {
+        $user = $request->user();
+    
+        if ($community->users()->where('users.id', $user->id)->exists()) {
+            return redirect()->route('community.show', $community)->with('message', 'Você já está inscrito nesta comunidade.');
+        }
+    
+        $community->users()->attach($user);
+    
+        return redirect()->route('community.show', $community)->with('message', 'Inscrição realizada com sucesso!');
+    }
+
+  public function showUsers(Community $community)
 {
-    $community->users()->attach(auth()->user()->id);
-    return redirect()->route('community.show', $community->id);
+    $users = $community->users;
+    return view('community.users', compact('community', 'users'));
+}  
 }
 
     
-}
+

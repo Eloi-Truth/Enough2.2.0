@@ -34,7 +34,24 @@ Route::middleware('auth')->group(function () {
 
 Route::resource('/community', CommunityController::class);
 //Route::get('community/{community}', 'CommunityController@show')->name('community.show');
-//Route::get('/community/{id}/edit', [CommunityController::class, 'edit'])->name('community.edit');
+//Route::get('/posts/{id}/edit', [PostController::class, 'edit'])->name('posts.edit');
+//Route::post('/communities/{community}/subscribe', [CommunityController::class 'subscribe'])->name('communities.subscribe');
+//Route::post('/communities/{community}/subscribe', [CommunityController::class, 'subscribe'])->name('communities.subscribe');
+
+Route::group(['middleware' => 'auth'], function () {
+    // Rota para inscrever-se em uma comunidade
+    Route::post('/communities/{community}/subscribe', [CommunityController::class, 'subscribe'])->name('communities.subscribe');
+
+    // Rota para acessar a comunidade e suas funcionalidades apenas para usuários inscritos
+    Route::get('/communities/{community}', [CommunityController::class, 'show'])->name('community.show');
+    Route::post('/communities/{community}/posts', [CommunityController::class, 'storePost'])->name('community.posts.store');
+    Route::post('/communities/{community}/posts/{post}/comments', [CommunityController::class, 'storeComment'])->name('community.comments.store');
+});
+
+
+
+Route::get('community/{community}/users', [CommunityController::class, 'showUsers'])->name('community.users');
+
 
 
 Route::resource('/posts', PostController::class);
@@ -43,7 +60,14 @@ Route::resource('/posts', PostController::class);
 Route::resource('/comment',CommentController::class);
 
 
-Route::resource('/likes', LikeController::class);
+//Route::resource('/likes/{id}', LikeController::class);
+//Route::post('/likes/{id}', [LikeController::class, 'store'])->name('likes.store');
+Route::delete('/likes/{id}', [LikeController::class, 'destroy'])->name('likes.destroy');
+Route::post('/likes', [LikeController::class, 'store'])->name('likes.store');
+
+Route::post('/communities/{community_id}/posts/{post_id}/likes', 'LikeController@store')->name('community.posts.likes.store');
+
+
 
 
 require __DIR__.'/auth.php';

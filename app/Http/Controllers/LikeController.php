@@ -36,7 +36,7 @@ class LikeController extends Controller
         $post_id = $request->input('post_id');
 
         // Verificar se o usuário já curtiu o post
-        if ($user->hasLikedPost($post_id)) {
+        if (Like::where('user_id', $user->id)->where('post_id', $post_id)->exists()) {
             return response()->json(['message' => 'Você já curtiu esse post.'], 409);
         }
 
@@ -89,6 +89,6 @@ class LikeController extends Controller
         // Excluir o registro de like
         $like->delete();
 
-        return response()->json(['message' => 'Like removido com sucesso.']);
+        return response()->json(['message' => 'Descurtido com sucesso.']);
     }
 }

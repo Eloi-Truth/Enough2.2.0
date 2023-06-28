@@ -1,15 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
-        <!-- <h2 class="font-semibold text-xl text-black dark:text-gray-200 leading-tight">
-            {{ __('Posts:') }}
-        </h2> -->
+        <h2 class="font-semibold text-xl text-black dark:text-gray-200 leading-tight">
+            Olá, {{ auth()->user()->name }}
+
     </x-slot>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
 
-                
+
                     <!-- POSTS -->
                     @foreach (App\Models\Post::all() as $post)
                     <div class="flex flex-col border-b mb-4" x-data="{ showComments: false, likesCount: {{ $post->likes }} }">
@@ -21,13 +21,14 @@
                                 <p class="text-black-600">{{ $post->user->name }}</p>
                             </div>
                         </div>
+                        
                         <div class="flex justify-between items-start p-4">
                             <div class="flex-grow">{{ $post->body }}</div>
                         </div>
 
                         <!-- Botão de Like -->
                         <div class="flex justify-end items-center p-4">
-                            <button class="text-gray-500 hover:text-red-500" @click="likePost({{ $post->id }})">
+                            <button class="text-gray-500 hover:text-red-500" @click="like.store({{ $post->id }}, {{ auth()->user()->id }})">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
                                     <path d="M19.84 5.68a5.5 5.5 0 0 1 0 7.77l-7.07 7.07a1.5 1.5 0 0 1-2.12 0L4.16 13.47a5.5 5.5 0 0 1 0-7.77 5.5 5.5 0 0 1 7.77 0L12 6.23l.47.47.47-.47a5.5 5.5 0 0 1 7.77 0zM12 21.5l-1.34-1.34a2 2 0 0 1-2.83 0L5.5 16" />
                                 </svg>
@@ -86,7 +87,37 @@
                     @endforeach
 
                 </div>
+                <script>
+                   const like = {
+        store: function(post_id, user_id) {
+            axios.post('/likes', {
+                post_id: post_id
+            })
+            .then(function(response) {
+                // Atualizar o contador de likes na interface
+                const likeCountElement = document.querySelector('.like-count');
+                likeCountElement.textContent = response.data.likesCount;
+            })
+            .catch(function(error) {
+                if (error.response.status === 409) {
+                    // O usuário já curtiu o post, exibir uma mensagem de erro
+                    alert('Você já curtiu esse post.');
+                } else {
+                    // Outro erro ocorreu, exibir uma mensagem genérica de erro
+                    alert('Ocorreu um erro ao processar a solicitação.');
+                }
+            });
+        }
+    };
+
+    
+
+    function toggleComments(element) {
+        const commentsDiv = element.nextElementSibling;
+        commentsDiv.classList.toggle('hidden');
+    }
+                </script>
             </div>
         </div>
     </div>
-</x-app-layout>
+    </x-a-layout>

@@ -20,8 +20,6 @@
                             <input type="text" name="body" id="body" value="{{ $post->body }}" class="border border-gray-300 rounded-md p-2 w-full">
                         </div>
 
-    
-
                         <div class="flex justify-end">
                             <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
                                 Salvar
@@ -32,4 +30,11 @@
             </div>
         </div>
     </div>
+
+    @if (session('status'))
+        <script>
+            alert("{{ session('status') }}");
+            window.location.href = "{{ route('community.show', ['id' => $post->community_id]) }}";
+        </script>
+    @endif
 </x-app-layout>
